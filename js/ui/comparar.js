@@ -34,9 +34,17 @@ export function prepara(crudo) {
   for (const [mia, { clave }] of Object.entries(MAPA)) {
     const ultimos = [], todas = [];
     for (const p of paises) {
-      const obs = observaciones(p, clave); if (!obs.length) continue;
+      let obs = observaciones(p, clave);
+      // Si los datos no traen la renta por trabajador, se estima como el modelo: PIB por persona ÷ (población en edad de trabajar × participación × empleo).
+      if (!obs.length && clave === 'rentaTrabajador') {
+        const pc = observaciones(p, 'pibPerCapita'), pa = observaciones(p, 'participacionLaboral'), de = observaciones(p, 'desempleo');
+        const pa_ = new Map(pa.map(o => [o.anio, o.valor])), de_ = new Map(de.map(o => [o.anio, o.valor]));
+        obs = pc.filter(o => pa_.has(o.anio) && de_.has(o.anio)).map(o => ({ anio: o.anio, valor: o.valor / (0.78 * pa_.get(o.anio) / 100 * (1 - de_.get(o.anio) / 100)) }))
+          .filter(o => Number.isFinite(o.valor));
+      }
+      if (!obs.length) continue;
       const nombre = p.nombre || p.codigo;
-      const fuente = p.indicadores?.[clave]?.fuente || p.fuente?.nombre || 'Banco Mundial';
+      const fuente = (clave === 'rentaTrabajador' && !p.indicadores?.[clave] ? 'Banco Mundial (estimado con PIB por persona, participación y empleo)' : p.indicadores?.[clave]?.fuente) || p.fuente?.nombre || 'Banco Mundial';
       const ord = [...obs].sort((a, b) => a.anio - b.anio), fin = ord[ord.length - 1];
       ultimos.push({ pais: nombre, valor: fin.valor, anio: fin.anio, fuente });
       for (const o of ord) todas.push({ pais: nombre, valor: o.valor, anio: o.anio, fuente });
