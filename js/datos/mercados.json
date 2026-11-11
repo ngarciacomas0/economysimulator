@@ -1,0 +1,74 @@
+{
+  "moneda": "USD",
+  "poblacionBase": 10000000,
+  "pibBase": 200000000000,
+  "nota": "Los mercados están calibrados para un país de 10 millones de habitantes y un PIB de 200 mil millones de USD. Las cantidades crecen proporcionalmente con la población; los precios permanecen constantes.",
+  "mercados": [
+    {
+      "id": "alimentos",
+      "nombre": "Alimentos",
+      "unidad": "canastas anuales de alimentos",
+      "precioInicial": 300,
+      "cantidadInicial": 120000000,
+      "pesoPIB": 18,
+      "sensibilidadDemanda": -0.3,
+      "sensibilidadOferta": 0.4,
+      "porcentajeImportado": 10
+    },
+    {
+      "id": "energia",
+      "nombre": "Energía",
+      "unidad": "paquetes anuales de energía",
+      "precioInicial": 200,
+      "cantidadInicial": 120000000,
+      "pesoPIB": 12,
+      "sensibilidadDemanda": -0.2,
+      "sensibilidadOferta": 0.3,
+      "porcentajeImportado": 25
+    },
+    {
+      "id": "vivienda",
+      "nombre": "Vivienda",
+      "unidad": "meses de alquiler",
+      "precioInicial": 600,
+      "cantidadInicial": 66666666.6667,
+      "pesoPIB": 20,
+      "sensibilidadDemanda": -0.6,
+      "sensibilidadOferta": 0.6,
+      "porcentajeImportado": 2
+    },
+    {
+      "id": "ropa_hogar",
+      "nombre": "Ropa y hogar",
+      "unidad": "canastas anuales de ropa y hogar",
+      "precioInicial": 200,
+      "cantidadInicial": 120000000,
+      "pesoPIB": 12,
+      "sensibilidadDemanda": -1.1,
+      "sensibilidadOferta": 1.5,
+      "porcentajeImportado": 45
+    },
+    {
+      "id": "tecnologia",
+      "nombre": "Tecnología",
+      "unidad": "unidades tecnológicas anuales",
+      "precioInicial": 2800,
+      "cantidadInicial": 10000000,
+      "pesoPIB": 14,
+      "sensibilidadDemanda": -1.5,
+      "sensibilidadOferta": 1.2,
+      "porcentajeImportado": 60
+    },
+    {
+      "id": "salud_educacion",
+      "nombre": "Salud y educación",
+      "unidad": "paquetes anuales de servicios",
+      "precioInicial": 4800,
+      "cantidadInicial": 10000000,
+      "pesoPIB": 24,
+      "sensibilidadDemanda": -0.25,
+      "sensibilidadOferta": 0.5,
+      "porcentajeImportado": 5
+    }
+  ]
+}

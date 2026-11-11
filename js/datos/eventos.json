@@ -1,0 +1,502 @@
+{
+  "version": 1,
+  "descripcion": "Catálogo de eventos de MiniPaís. Cada efecto lleva un rango [mín, máx]; cada simulación sortea un valor dentro de él y el signo no cambia. Tipos: demanda, oferta, impuesto, importaciones, exportaciones. mercado: id de un mercado o \"todos\" (solo demanda/exportaciones).",
+  "eventos": [
+    {
+      "id": "moda",
+      "categoria": "gustos",
+      "titular": "Los consumidores se vuelcan a la ropa importada",
+      "explicacion": "Una nueva moda llega de afuera. Las tiendas locales venden menos.",
+      "efectos": [
+        {
+          "mercado": "ropa",
+          "tipo": "importaciones",
+          "rango": [
+            15,
+            30
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sequia",
+      "categoria": "clima",
+      "titular": "Sequía golpea los cultivos del país",
+      "explicacion": "Llovió muy poco. Cultivar cuesta más y se cosecha menos.",
+      "efectos": [
+        {
+          "mercado": "alimentos",
+          "tipo": "oferta",
+          "rango": [
+            -35,
+            -15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chips",
+      "categoria": "tecnologia",
+      "titular": "Celulares y laptops se abaratan",
+      "explicacion": "Una nueva fábrica baja los costos. Todos pueden comprar más.",
+      "efectos": [
+        {
+          "mercado": "tecnologia",
+          "tipo": "oferta",
+          "rango": [
+            15,
+            35
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vejez",
+      "categoria": "politica",
+      "titular": "El país envejece y pide más salud",
+      "explicacion": "Hay más personas mayores. Los hospitales tienen más pacientes.",
+      "efectos": [
+        {
+          "mercado": "salud",
+          "tipo": "demanda",
+          "rango": [
+            10,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "id": "recesion",
+      "categoria": "crisis",
+      "titular": "Recesión en los países vecinos",
+      "explicacion": "Los vecinos compran menos. Las ventas al extranjero se frenan.",
+      "efectos": [
+        {
+          "mercado": "todos",
+          "tipo": "exportaciones",
+          "rango": [
+            -20,
+            -8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-helada",
+      "categoria": "clima",
+      "titular": "Una helada tardía arruina cosechas",
+      "explicacion": "El frío llegó fuera de temporada. Hay menos cosecha y cultivar sale más caro.",
+      "efectos": [
+        {
+          "mercado": "alimentos",
+          "tipo": "oferta",
+          "rango": [
+            -25,
+            -10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-cosecha",
+      "categoria": "clima",
+      "titular": "Cosecha récord por buen clima",
+      "explicacion": "Llovió justo lo necesario. Hay comida de sobra y los precios bajan.",
+      "efectos": [
+        {
+          "mercado": "alimentos",
+          "tipo": "oferta",
+          "rango": [
+            10,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-dieta",
+      "categoria": "gustos",
+      "titular": "Se pone de moda comer saludable",
+      "explicacion": "Más gente quiere frutas y verduras frescas. La demanda de alimentos sube.",
+      "efectos": [
+        {
+          "mercado": "alimentos",
+          "tipo": "demanda",
+          "rango": [
+            8,
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-petroleo",
+      "categoria": "crisis",
+      "titular": "Se dispara el precio del petróleo",
+      "explicacion": "Producir y mover energía cuesta mucho más. La oferta de energía se encoge.",
+      "efectos": [
+        {
+          "mercado": "energia",
+          "tipo": "oferta",
+          "rango": [
+            -30,
+            -12
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-solar",
+      "categoria": "tecnologia",
+      "titular": "Paneles solares baratos llegan al país",
+      "explicacion": "Nueva tecnología abarata la electricidad. Hay más energía a menor costo.",
+      "efectos": [
+        {
+          "mercado": "energia",
+          "tipo": "oferta",
+          "rango": [
+            12,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-calor",
+      "categoria": "clima",
+      "titular": "Ola de calor: todos prenden el aire acondicionado",
+      "explicacion": "El consumo de electricidad se dispara durante semanas.",
+      "efectos": [
+        {
+          "mercado": "energia",
+          "tipo": "demanda",
+          "rango": [
+            10,
+            22
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-interes",
+      "categoria": "politica",
+      "titular": "Bajan las tasas de interés",
+      "explicacion": "Los créditos hipotecarios se abaratan y más familias quieren comprar casa.",
+      "efectos": [
+        {
+          "mercado": "vivienda",
+          "tipo": "demanda",
+          "rango": [
+            8,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-construccion",
+      "categoria": "economia",
+      "titular": "Sube el costo de los materiales de construcción",
+      "explicacion": "Cemento y acero cuestan más. Construir vivienda se vuelve más caro.",
+      "efectos": [
+        {
+          "mercado": "vivienda",
+          "tipo": "oferta",
+          "rango": [
+            -20,
+            -8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-teletrabajo",
+      "categoria": "gustos",
+      "titular": "El teletrabajo vacía las oficinas",
+      "explicacion": "La gente prefiere casas más grandes y lejos del centro.",
+      "efectos": [
+        {
+          "mercado": "vivienda",
+          "tipo": "demanda",
+          "rango": [
+            5,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-rebajas",
+      "categoria": "economia",
+      "titular": "Gran temporada de rebajas en ropa y hogar",
+      "explicacion": "Las tiendas liquidan inventario y el público responde con entusiasmo.",
+      "efectos": [
+        {
+          "mercado": "ropa",
+          "tipo": "demanda",
+          "rango": [
+            8,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-arancel-ropa",
+      "categoria": "politica",
+      "titular": "Se crea un impuesto a la ropa",
+      "explicacion": "Producir y vender ropa cuesta más por el nuevo impuesto.",
+      "efectos": [
+        {
+          "mercado": "ropa",
+          "tipo": "impuesto",
+          "rango": [
+            6,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-apertura",
+      "categoria": "politica",
+      "titular": "Se abren las fronteras a productos importados",
+      "explicacion": "Llegan ropa y artículos del hogar baratos desde afuera.",
+      "efectos": [
+        {
+          "mercado": "ropa",
+          "tipo": "importaciones",
+          "rango": [
+            8,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-chips-escasez",
+      "categoria": "crisis",
+      "titular": "Escasez mundial de chips",
+      "explicacion": "Las fábricas del mundo producen menos y los aparatos electrónicos escasean.",
+      "efectos": [
+        {
+          "mercado": "tecnologia",
+          "tipo": "oferta",
+          "rango": [
+            -28,
+            -12
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-ia",
+      "categoria": "tecnologia",
+      "titular": "Boom de la inteligencia artificial",
+      "explicacion": "Empresas y hogares compran más equipos y servicios tecnológicos.",
+      "efectos": [
+        {
+          "mercado": "tecnologia",
+          "tipo": "demanda",
+          "rango": [
+            10,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-vacunas",
+      "categoria": "salud",
+      "titular": "Campaña nacional de vacunación",
+      "explicacion": "Más personas acuden a los centros de salud.",
+      "efectos": [
+        {
+          "mercado": "salud",
+          "tipo": "demanda",
+          "rango": [
+            8,
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-huelga-medicos",
+      "categoria": "politica",
+      "titular": "Huelga de médicos y docentes",
+      "explicacion": "Los servicios de salud y educación funcionan a medias durante semanas.",
+      "efectos": [
+        {
+          "mercado": "salud",
+          "tipo": "oferta",
+          "rango": [
+            -22,
+            -8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-subsidio-salud",
+      "categoria": "politica",
+      "titular": "El gobierno subsidia la salud y la educación",
+      "explicacion": "Con ayuda del Estado, prestar estos servicios cuesta menos y llegan a más gente.",
+      "efectos": [
+        {
+          "mercado": "salud",
+          "tipo": "oferta",
+          "rango": [
+            8,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-electricos",
+      "categoria": "tecnologia",
+      "titular": "Llegan los carros eléctricos baratos",
+      "explicacion": "Más familias se animan a cambiar de carro.",
+      "efectos": [
+        {
+          "mercado": "auto",
+          "tipo": "demanda",
+          "rango": [
+            8,
+            22
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-gasolina",
+      "categoria": "crisis",
+      "titular": "La gasolina se encarece y la gente deja el carro",
+      "explicacion": "Moverse en carro cuesta mucho más, y el transporte vende menos.",
+      "efectos": [
+        {
+          "mercado": "auto",
+          "tipo": "demanda",
+          "rango": [
+            -20,
+            -8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-acero",
+      "categoria": "economia",
+      "titular": "Falta de acero frena las fábricas de autos",
+      "explicacion": "Sin materiales, las armadoras producen menos vehículos.",
+      "efectos": [
+        {
+          "mercado": "auto",
+          "tipo": "oferta",
+          "rango": [
+            -22,
+            -8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-mundial",
+      "categoria": "gustos",
+      "titular": "El país organiza un gran torneo deportivo",
+      "explicacion": "Llegan miles de turistas y las reservas se llenan.",
+      "efectos": [
+        {
+          "mercado": "turismo",
+          "tipo": "demanda",
+          "rango": [
+            15,
+            35
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-pandemia",
+      "categoria": "crisis",
+      "titular": "Un brote obliga a limitar los viajes",
+      "explicacion": "Hoteles y restaurantes se quedan casi vacíos.",
+      "efectos": [
+        {
+          "mercado": "turismo",
+          "tipo": "demanda",
+          "rango": [
+            -35,
+            -15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-vuelos",
+      "categoria": "economia",
+      "titular": "Nuevas aerolíneas de bajo costo",
+      "explicacion": "Los vuelos y paquetes turísticos se abaratan.",
+      "efectos": [
+        {
+          "mercado": "turismo",
+          "tipo": "oferta",
+          "rango": [
+            10,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-boom-exportador",
+      "categoria": "economia",
+      "titular": "Los socios comerciales crecen y compran más",
+      "explicacion": "Las ventas al exterior suben en casi todos los sectores.",
+      "efectos": [
+        {
+          "mercado": "todos",
+          "tipo": "exportaciones",
+          "rango": [
+            8,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-subsidio-general",
+      "categoria": "politica",
+      "titular": "El gobierno reparte un bono a las familias",
+      "explicacion": "Con dinero extra en el bolsillo, la gente compra más de todo.",
+      "efectos": [
+        {
+          "mercado": "todos",
+          "tipo": "demanda",
+          "rango": [
+            4,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x-austeridad",
+      "categoria": "politica",
+      "titular": "Plan de austeridad y recorte del gasto",
+      "explicacion": "Con menos gasto público y más impuestos, las familias compran menos.",
+      "efectos": [
+        {
+          "mercado": "todos",
+          "tipo": "demanda",
+          "rango": [
+            -10,
+            -4
+          ]
+        }
+      ]
+    }
+  ]
+}

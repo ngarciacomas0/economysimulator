@@ -1,0 +1,14 @@
+# Secretos: nunca al repositorio
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Dependencias y basura
+node_modules/
+npm-debug.log*
+*.log
+coverage/
+.DS_Store
+Thumbs.db

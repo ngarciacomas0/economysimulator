@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MiniPaís</title>
+<link rel="stylesheet" href="css/estilos.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.min.js"></script>
+<script type="module" src="js/main.js"></script>
+</head>
+<body class="vista-micro">
+<header class="barra">
+  <div class="pais"><span id="bandera"></span><h1 id="nombre">MiniPaís</h1></div>
+  <button id="chip-noticia" class="noticia" hidden title="Ver la noticia otra vez"><span class="ico">📰</span><span id="chip-txt"></span></button>
+  <div class="acciones"><button id="btn-menu" class="redondo menu3" aria-haspopup="dialog" title="Menú" aria-label="Abrir el menú"><span></span><span></span><span></span></button></div>
+</header>
+<div class="pestanas" role="tablist"><button data-v="micro" class="act">Mercados</button><button data-v="macro">Indicadores</button></div>
+<main class="paneles">
+  <section id="micro" class="col" aria-label="Micro: los mercados">
+    <div class="tarjeta crece"><div class="cab"><h3 id="t-mercado">Mercado</h3><div id="chips" class="chips"></div></div><div class="graf"><canvas id="c-mercado"></canvas><div id="flash" class="flash" hidden><span class="emo"></span><span class="nom"></span></div></div></div>
+    <div id="mercados" class="mercados"></div>
+  </section>
+  <section id="macro" class="col" aria-label="Macro: el país">
+    <h3 class="rotulo">Indicadores macroeconómicos</h3>
+    <div id="kpis" class="kpis"></div>
+    <p class="pista-kpi">Toca un indicador para ver el detalle.</p>
+  </section>
+</main>
+<div id="modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="m-tit">
+  <div class="papel">
+    <div class="cabecera"><span id="m-diario" class="diario"></span><span><span id="m-etq" class="etq"></span><button id="m-x" class="cerrar" aria-label="Cerrar">✕</button></span></div>
+    <h2 id="m-tit" class="m-titular"></h2>
+    <p id="m-exp" class="m-exp"></p>
+    <button id="btn-ver" class="grande">Ver qué pasa ▶</button>
+  </div>
+</div>
+<button id="btn-sig" class="flotante" hidden>Siguiente ▶</button>
+<div id="menu-lat" class="cajon" hidden>
+  <div id="menu-velo" class="velo"></div>
+  <aside class="hoja" role="dialog" aria-modal="true" aria-labelledby="menu-tit">
+    <header class="hoja-cab"><h2 id="menu-tit">Menú</h2><button id="menu-x" class="cerrar" aria-label="Cerrar">✕</button></header>
+    <div class="hoja-cuerpo">
+      <div class="bloque" style="--ac:var(--acento)">
+        <h4 class="tit"><span class="ic">▶</span>Acciones</h4>
+        <div class="acc-col">
+          <button id="btn-sim" class="grande">Simular evento</button>
+          <button id="btn-ia" hidden>Evento con IA</button>
+          <button id="btn-reset">Reiniciar</button>
+          <button id="btn-pres">🖥 Modo presentación</button>
+        </div>
+      </div>
+      <div class="bloque" style="--ac:#ffa04d">
+        <h4 class="tit"><span class="ic">💬</span>Qué pasó</h4>
+        <div id="resumen" class="resumen"></div>
+      </div>
+      <div class="bloque" style="--ac:#6aa8ff">
+        <h4 class="tit"><span class="ic">⚙</span>Opciones</h4>
+        <div class="opc">
+          <label>Población <select id="sel-pob"><option value="1">1 millón</option><option value="10" selected>10 millones</option><option value="50">50 millones</option><option value="100">100 millones</option></select></label>
+          <label>Perfil del país <select id="sel-perfil"><option value="emergente">Emergente</option><option value="medio" selected>Medio-alto</option><option value="desarrollado">Desarrollado</option></select></label>
+          <label>Mercados <select id="sel-n"><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></label>
+          <label class="fila"><input type="checkbox" id="chk-guiado"> Modo guiado (paso a paso)</label>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+<div id="cajon" class="cajon" hidden>
+  <div id="velo" class="velo"></div>
+  <aside class="hoja" role="dialog" aria-modal="true" aria-labelledby="cj-tit">
+    <header class="hoja-cab"><h2 id="cj-tit"></h2><button id="cj-x" class="cerrar" aria-label="Cerrar">✕</button></header>
+    <div id="cj-cuerpo" class="hoja-cuerpo"></div>
+  </aside>
+</div>
+</body>
+</html>
