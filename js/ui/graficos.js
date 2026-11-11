@@ -65,11 +65,14 @@ const limite = (v, a, b) => Math.max(a, Math.min(b, v));
 
 function dibujaMonopolio(ctx, ch, A, k) {
   const X = ch.scales.x, Y = ch.scales.y, px = q => X.getPixelForValue(q), py = p => Y.getPixelForValue(p), mor = '#c792ea', rojo = '#ff6b72', tinta = css('--tinta');
-  // Pérdida para la sociedad: lo que se deja de producir al restringir la cantidad.
-  ctx.beginPath(); ctx.moveTo(px(k.Qm), py(k.Pm)); ctx.lineTo(px(k.Qe), py(k.Pe)); ctx.lineTo(px(k.Qm), py(k.cmg)); ctx.closePath();
+  const plano = k.cmg === 0 && k.Qc > k.Qm;                      // el costo marginal vale 0 hasta Qc y de ahí sube
+  // Pérdida para la sociedad: entre la demanda (arriba) y el costo marginal (abajo), de lo que produce el monopolio a lo regulado.
+  const area = plano ? [[k.Qm, k.Pm], [k.Qe, k.Pe], [k.Qc, 0], [k.Qm, 0]] : [[k.Qm, k.Pm], [k.Qe, k.Pe], [k.Qm, k.cmg]];
+  ctx.beginPath(); area.forEach(([q, p], i) => (i ? ctx.lineTo : ctx.moveTo).call(ctx, px(q), py(p))); ctx.closePath();
   ctx.fillStyle = 'rgba(255,107,114,.28)'; ctx.fill();
-  // Curva de ingreso marginal (cae el doble de rápido que la demanda).
-  const qa = X.min, qb = X.max; ctx.setLineDash([9, 5]); ctx.lineWidth = 3; ctx.strokeStyle = mor;
+  // Ingreso marginal: cae el doble de rápido que la demanda. Se dibuja solo mientras es positivo y cabe en la gráfica.
+  const qa = Math.max(X.min, (Y.max - k.alfa) / (2 * k.beta)), qb = Math.min(X.max, -k.alfa / (2 * k.beta));
+  ctx.setLineDash([9, 5]); ctx.lineWidth = 3; ctx.strokeStyle = mor;
   ctx.beginPath(); ctx.moveTo(px(qa), py(k.alfa + 2 * k.beta * qa)); ctx.lineTo(px(qb), py(k.alfa + 2 * k.beta * qb)); ctx.stroke(); ctx.setLineDash([]);
   // Del cruce IMg = CMg hacia arriba, hasta la demanda: ahí la empresa fija su precio.
   ctx.setLineDash([5, 4]); ctx.lineWidth = 1.8; ctx.strokeStyle = tinta;
@@ -77,11 +80,13 @@ function dibujaMonopolio(ctx, ch, A, k) {
   const punto = (q, p, rel, c) => { ctx.beginPath(); ctx.arc(px(q), py(p), 7, 0, 7); ctx.fillStyle = rel; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = c; ctx.stroke(); };
   punto(k.Qm, k.cmg, css('--tarj'), mor);                       // ① donde IMg = CMg
   punto(k.Qm, k.Pm, rojo, tinta);                               // ② precio del monopolio
-  texto(ctx, '① IMg = CMg: produce solo ' + fQ(k.Qm), px(k.Qm) + 12, py(k.cmg) + 16, mor, 'left', '800 12px system-ui');
+  texto(ctx, '① IMg = CMg: produce solo ' + fQ(k.Qm), px(k.Qm) - 12, py(k.cmg) + 18, mor, 'right', '800 12px system-ui');
   texto(ctx, '② Monopolio sin restricciones: ' + fP(k.Pm) + ' · ' + fQ(k.Qm), px(k.Qm) + 12, py(k.Pm) - 10, rojo, 'left', '800 13px system-ui');
-  texto(ctx, 'Con regulación: ' + fP(k.Pe) + ' · ' + fQ(k.Qe), px(k.Qe) + 10, py(k.Pe) + 20, tinta, 'left', '700 12px system-ui');
+  texto(ctx, 'Con regulación: ' + fP(k.Pe) + ' · ' + fQ(k.Qe), px(k.Qe) + 12, py(k.Pe) + 20, tinta, 'left', '700 12px system-ui');
   texto(ctx, 'Ingreso marginal (IMg)', A.left + 10, A.top + 34, mor, 'left', '800 13px system-ui');
-  texto(ctx, 'Pérdida para la sociedad', (px(k.Qm) + px(k.Qe)) / 2, (py(k.Pm) + py(k.cmg)) / 2 + 4, rojo, 'center', '700 11px system-ui');
+  if (plano && px(k.Qc) - px(k.Qm) > 150) texto(ctx, 'Costo marginal = 0', (px(k.Qm) + px(k.Qc)) / 2, py(0) + 18, css('--ofe'), 'center', '700 11px system-ui');
+  const cx = area.reduce((s, [q]) => s + px(q), 0) / area.length, cy = area.reduce((s, [, p]) => s + py(p), 0) / area.length;
+  texto(ctx, 'Pérdida para la sociedad', cx, cy + 4, rojo, 'center', '700 11px system-ui');
 }
 
 const pluginMercado = { id: 'anotaM', afterDatasetsDraw(ch) {
@@ -147,7 +152,7 @@ export function monopolioDe(m) {
   // Un costo no puede ser negativo: si la recta de oferta se pasa de cero, el costo de la última unidad se toma como 0.
   if (cmg < 0) { Qm = -alfa / (2 * beta); cmg = 0; }
   const Pm = alfa + beta * Qm;
-  return { Pe, Qe, Pm, Qm, cmg, alfa, beta, inv };
+  return { Pe, Qe, Pm, Qm, cmg, alfa, beta, inv, Qc: Qe - ss * Pe };   // Qc: cantidad a la que el costo marginal deja de ser 0
 }
 
 // Dibuja un mercado en una de tres fases, siempre con los mismos ejes para que el movimiento se note:
@@ -163,12 +168,18 @@ export function graficoMercado(canvas, a, m, o = {}) {
   const peq = !mono && Math.abs(m.cantidad / a.cantidad - 1) < .003 && Math.abs(m.precio / a.precio - 1) < .003;
   if (peq) { a = m; o = { ...o, shift: null, rastro: false, fase: 'antes', solo: null }; }
   const fase = o.fase || 'fin', gris = css('--antes'), viaja = fase !== 'antes';
-  // En la vista de monopolio los ejes se abren para que quepan el punto de equilibrio y el del monopolio.
-  const caja = (lo, hi) => nice((lo + hi) / 2, (hi - lo) / 2 * 1.08, true);
-  const rx = mono ? caja(mono.Qm * .85, mono.Qe * 1.15) : nice((a.cantidad + m.cantidad) / 2, zoom(a.cantidad, m.cantidad - a.cantidad), true);
-  const ry = mono ? caja(Math.min(mono.cmg, mono.Pe) * .85, mono.Pm * 1.1) : nice((a.precio + m.precio) / 2, zoom(a.precio, m.precio - a.precio), true);
-  const recta = pts => { const n = pts.length, p = pts[Math.floor(n / 3)], q = pts[Math.floor(2 * n / 3)], xa = y => p.x + (y - p.y) * (q.x - p.x) / (q.y - p.y);
-    return [{ x: xa(ry.min), y: ry.min }, { x: xa(ry.max), y: ry.max }]; };
+  // En la vista de monopolio los ejes parten de 0 (con un colchón debajo del precio 0) y llegan a un número redondo
+  // que deja espacio a los dos puntos; así el dibujo queda centrado y sin cifras negativas.
+  const techo = v => nice(v / 2, v / 2, true).max;
+  const yTop = mono ? techo(mono.Pm * 1.12) : 0;
+  const rx = mono ? { min: 0, max: techo(mono.Qe * 1.2) } : nice((a.cantidad + m.cantidad) / 2, zoom(a.cantidad, m.cantidad - a.cantidad), true);
+  const ry = mono ? { min: -yTop * .08, max: yTop } : nice((a.precio + m.precio) / 2, zoom(a.precio, m.precio - a.precio), true);
+  // Cantidad de una curva a un precio dado, a partir de dos de sus puntos.
+  const xaDe = pts => { const n = pts.length, p = pts[Math.floor(n / 3)], q = pts[Math.floor(2 * n / 3)]; return y => p.x + (y - p.y) * (q.x - p.x) / (q.y - p.y); };
+  const recta = pts => { const xa = xaDe(pts); return [{ x: xa(ry.min), y: ry.min }, { x: xa(ry.max), y: ry.max }]; };
+  // Oferta como costo marginal: no puede ser negativo, así que vale 0 hasta donde la recta llega a P = 0.
+  const rectaCMg = pts => { const xa = xaDe(pts), x0 = xa(0), alto = { x: xa(ry.max), y: ry.max };
+    return x0 > rx.min ? [{ x: rx.min, y: 0 }, { x: x0, y: 0 }, alto] : [{ x: x0, y: 0 }, alto]; };
   const vivo = viaja ? m : a;
   // o.solo permite mover una curva primero y la otra después, cuando el evento golpea a las dos.
   const cDem = (viaja && o.solo !== 'oferta') ? m : a, cOfe = (viaja && o.solo !== 'demanda') ? m : a;
@@ -179,10 +190,10 @@ export function graficoMercado(canvas, a, m, o = {}) {
   notas.set(canvas, { a, b: m, fase, shift: o.shift, trabajo: false, peq: peq && !!o.evento, mono });
   dibujar(canvas, { type: 'scatter', data: { datasets: [
     linea(recta(a.curvas.demanda), gris, rastro('demanda')), linea(recta(a.curvas.oferta), gris, rastro('oferta')),
-    linea(recta(cDem.curvas.demanda), css('--dem')), linea(recta(cOfe.curvas.oferta), css('--ofe')),
+    linea(recta(cDem.curvas.demanda), css('--dem')), linea((mono ? rectaCMg : recta)(cOfe.curvas.oferta), css('--ofe')),
     { label: '', data: [{ x: a.cantidad, y: a.precio }], pointRadius: 7, backgroundColor: 'transparent', borderWidth: 2, borderColor: fase === 'fin' ? gris : invisible },
     { label: '', data: [{ x: vivo.cantidad, y: vivo.precio }], pointRadius: 8, backgroundColor: css('--tinta') }] },
-  options: ejes('Cantidad (unidades)', 'Precio por unidad ($)', rx, ry, fQ, fP) }, pluginMercado);
+  options: ejes('Cantidad (unidades)', 'Precio por unidad ($)', rx, ry, fQ, mono ? v => (v < 0 ? '' : fP(v)) : fP) }, pluginMercado);
 }
 
 const pluginTrabajo = { id: 'anotaT', afterDatasetsDraw(ch) {

@@ -112,7 +112,8 @@ async function verMercado(id, { animar = false, pausa = 1250 } = {}) {
     const bm = document.createElement('button');
     bm.type = 'button'; bm.className = 'mono-btn' + (monoOn ? ' on' : '');
     bm.textContent = monoOn ? '↩ Volver al evento' : '📈 Ver monopolio sin restricciones';
-    bm.onclick = () => { if (!ocupado) { monoOn = !monoOn; verMercado(m.id); } };
+    // La gráfica se rehace al entrar y salir de esta vista: así no arrastra el zoom ni los ejes de la anterior.
+    bm.onclick = () => { if (!ocupado) { monoOn = !monoOn; reiniciaGrafica($('#c-mercado')); verMercado(m.id); } };
     $('#t-mercado').appendChild(bm);
   }
   setMonopolio(monoOn && esMono);
