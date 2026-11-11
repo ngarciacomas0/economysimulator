@@ -1,6 +1,6 @@
 // Agente 7 · Director de orquesta. Un solo estado; todo se dibuja con render(estado, informe).
 import { identidad, globito, resumen, etiquetaNivel, textoPaso, tipoDe, nombreTipo, explicaMercado } from './ui/narrativa.js';
-import { graficoMercado, graficoTrabajo, reiniciaGrafica } from './ui/graficos.js';
+import { graficoMercado, graficoTrabajo, reiniciaGrafica, setMonopolio, monopolioDe } from './ui/graficos.js';
 import { renderKpis, detalleKpi } from './ui/kpis.js';
 import { conectar } from './conector.js';
 import { prepara, comparaTodo } from './ui/comparar.js';
@@ -13,7 +13,7 @@ const esperar = ms => new Promise(r => setTimeout(r, sinMov ? 0 : ms));
 // Cuando existan los motores reales (motor/eventos.js, mercados.js...), se usan solos.
 const PERFILES = { emergente: [6000, 62, 9], medio: [20000, 64, 6], desarrollado: [45000, 66, 4.5] };
 const MK = [   // respaldo; si existe datos/mercados.json, se reemplaza por esos mercados
-  ['alimentos', 'Alimentos', 18, -.3, .4, 5, 10], ['energia', 'Energía', 12, -.2, .3, 70, 25], ['vivienda', 'Vivienda', 20, -.6, .6, 900, 2], ['ropa', 'Ropa y hogar', 12, -1.1, 1.5, 25, 45], ['tecnologia', 'Tecnología', 14, -1.5, 1.2, 400, 60], ['salud', 'Salud y educación', 24, -.25, .5, 120, 5], ['auto', 'Automotriz y transporte', 12, -1.2, 1, 8000, 55], ['turismo', 'Turismo y ocio', 10, -1.3, 1.2, 150, 10]];
+  ['alimentos', 'Alimentos', 18, -.3, .4, 5, 10], ['energia', 'Energía', 12, -.5, .8, 70, 25], ['vivienda', 'Vivienda', 20, -.6, .6, 900, 2], ['ropa', 'Ropa y hogar', 12, -1.1, 1.5, 25, 45], ['tecnologia', 'Tecnología', 14, -1.5, 1.2, 400, 60], ['salud', 'Salud y educación', 24, -.25, .5, 120, 5], ['auto', 'Automotriz y transporte', 12, -1.2, 1, 8000, 55], ['turismo', 'Turismo y ocio', 10, -1.3, 1.2, 150, 10]];
 // Respaldo mínimo: el catálogo completo vive en js/datos/eventos.json y es el que se usa normalmente.
 const EVENTOS = [
   { id: 'moda', categoria: 'gustos', titular: 'Los consumidores se vuelcan a la ropa importada', explicacion: 'Una nueva moda llega de afuera. Las tiendas locales venden menos.', efectos: [{ mercado: 'ropa', tipo: 'importaciones', valor: 25 }] },
@@ -185,9 +185,10 @@ const golpeadoPor = id => informe?.evento.efectos.find(g => g.mercado === id || 
 // Muestra un mercado en tres tiempos: se ve el «antes», las curvas se trasladan solas dejando su
 // rastro punteado, y al final quedan los dos puntos de equilibrio. Vale igual para el mercado
 // golpeado y para los que solo recibieron la ola, así el evento se puede repasar mercado por mercado.
-let seq = 0;
+let seq = 0, monoOn = false;
 async function verMercado(id, { animar = false, pausa = 1250 } = {}) {
   const mio = ++seq;
+  if (animar) monoOn = false;
   const esTrabajo = id === TRABAJO;
   const m = esTrabajo ? { id: TRABAJO, nombre: 'Mercado laboral' } : (estado.mercados.find(x => x.id === id) || estado.mercados[0]);
   selId = m.id; marcarSel(m.id);
@@ -196,6 +197,13 @@ async function verMercado(id, { animar = false, pausa = 1250 } = {}) {
   $('#t-mercado').innerHTML = `${m.nombre} ${globito(esTrabajo ? 'trabajo' : 'sensibilidad')}`
     + (tm ? ` <button class="tipo-m ${tm.tipo}" type="button" title="Ver las características de este mercado">${tm.tipo === 'monopolio' ? '🏛️' : '🏪'} ${nombreTipo(tm.tipo)}</button>` : '');
   const bt = $('#t-mercado .tipo-m'); if (bt) bt.onclick = () => abrirTipo(m);
+  if (m.id === 'energia' && !esTrabajo) {
+    const bm = document.createElement('button'); bm.type = 'button'; bm.className = 'mono-btn' + (monoOn ? ' on' : '');
+    bm.textContent = monoOn ? '↩ Volver al evento' : '📈 Ver monopolio sin restricciones';
+    bm.onclick = () => { if (ocupado) return; monoOn = !monoOn; verMercado(m.id, { animar: false }); };
+    $('#t-mercado').appendChild(bm);
+  }
+  setMonopolio(monoOn && m.id === 'energia' && !esTrabajo);
   const pinta = esTrabajo
     ? (a, t, o) => graficoTrabajo($('#c-mercado'), a, t, o)
     : (a, t, o) => graficoMercado($('#c-mercado'), a, t, { ...o, evento: !!informe });
@@ -210,6 +218,12 @@ async function verMercado(id, { animar = false, pausa = 1250 } = {}) {
     ? (dQ >= 0 ? 'Las empresas contratan más gente' : 'Las empresas contratan menos gente')
     : (g ? calcShift(g) : { curva: 'demanda', dir: Math.sign(dQ), txt: dQ >= 0 ? 'Más sueldos → más compras aquí' : 'Menos sueldos → menos compras aquí' });
 
+  if (monoOn && m.id === 'energia' && !esTrabajo) {                  // vista de monopolio: sin animación, con explicación en los avisos
+    pinta(a, t, { fase: 'antes' });
+    const k = monopolioDe(t);
+    if (k) $('#chips').innerHTML = fich(`Regulado: ${fPrecio(k.Pe)}`, 'dem') + fich(`Monopolio: ${fPrecio(k.Pm)}  ▲ ${coma((k.Pm / k.Pe - 1) * 100)} %`, 'baja') + fich(`Cantidad  ▼ ${coma((1 - k.Qm / k.Qe) * 100)} %`, 'baja');
+    return;
+  }
   if (!hayCambio) { if (animar) { reiniciaGrafica($('#c-mercado')); await telon(m); if (mio !== seq) return; }
     pinta(a, t, { fase: 'fin', rastro: false }); return; }
   // La gráfica ya queda lista en el «antes» detrás del telón; al levantarse, se ve el traslado.
@@ -232,6 +246,8 @@ async function verMercado(id, { animar = false, pausa = 1250 } = {}) {
       + fich(`Cantidad ${fl(dQ)} ${coma(Math.abs(dQ))} %`, dQ >= 0 ? 'sube' : 'baja');
 }
 
+const fPrecio = v => '$ ' + v.toLocaleString('es', { maximumFractionDigits: v < 100 ? 1 : 0 });
+
 // ----- el periódico: pop-up y después una línea en la barra -----
 function abrirNoticia(ev, alCerrar) {
   noticia = ev; $('#m-diario').textContent = ident.periodico; $('#m-etq').textContent = etiquetaNivel(ev);
@@ -245,7 +261,7 @@ function abrirNoticia(ev, alCerrar) {
 // ----- panel lateral de un indicador -----
 const rotuloAnio = () => { $('.rotulo').textContent = `Indicadores macroeconómicos · Año ${historial.length - 1}`; };
 function abrirTipo(m) {
-  $('#cj-tit').textContent = 'Tipo de mercado'; $('#cj-cuerpo').innerHTML = explicaMercado(m.id, m.nombre); $('#cajon').hidden = false;
+  $('#cj-tit').textContent = 'Tipo de mercado'; $('#cj-cuerpo').innerHTML = explicaMercado(m.id, m.nombre, m.id === 'energia' ? monopolioDe(estado.mercados.find(x => x.id === 'energia') || m) : null); $('#cajon').hidden = false;
   document.querySelectorAll('.kpi').forEach(k => k.classList.remove('abierto')); $('#cj-x').focus();
 }
 function abrirCajon(clave) {

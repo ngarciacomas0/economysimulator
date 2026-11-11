@@ -5,6 +5,8 @@
 *.pem
 *.key
 
+RESUMEN-PARA-NUEVO-CHAT.md
+
 # Dependencias y basura
 node_modules/
 npm-debug.log*

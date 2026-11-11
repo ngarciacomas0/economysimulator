@@ -1,4 +1,4 @@
-// Agente 7 · Comparación con países reales y con años concretos de la historia.
+// Comparación con países reales y con años concretos de la historia.
 // Lee datos/paises.json tal como lo genera scripts/actualizar_datos.js:
 //   paises[].indicadores[clave] = { nombre, codigo, unidad, fuente, observaciones: [{anio, valor, fuente}] }
 // Acepta también que el indicador sea directamente el array de observaciones.

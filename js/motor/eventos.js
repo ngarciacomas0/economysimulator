@@ -31,7 +31,7 @@ export const PARAMETROS = Object.freeze({
 // [id, nombre, peso en el PIB, sensibilidad demanda, sensibilidad oferta, precio de partida, % importado, unidad]
 const MERCADOS = [
   ['alimentos', 'Alimentos', 18, -0.3, 0.4, 5, 10, 'canastas'],
-  ['energia', 'Energía', 12, -0.2, 0.3, 70, 25, 'megavatios hora'],
+  ['energia', 'Energía', 12, -0.5, 0.8, 70, 25, 'megavatios hora'],
   ['vivienda', 'Vivienda', 20, -0.6, 0.6, 900, 2, 'alquileres mensuales'],
   ['ropa', 'Ropa y hogar', 12, -1.1, 1.5, 25, 45, 'prendas'],
   ['tecnologia', 'Tecnología', 14, -1.5, 1.2, 400, 60, 'aparatos'],

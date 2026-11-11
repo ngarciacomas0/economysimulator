@@ -63,6 +63,27 @@ const punto = (ctx, x, y, c, r = 4.5) => { ctx.beginPath(); ctx.arc(x, y, r, 0, 
 const xEn = (el, y) => { const [p, q] = el, t = (y - p.y) / (q.y - p.y); return p.x + (q.x - p.x) * t; };
 const limite = (v, a, b) => Math.max(a, Math.min(b, v));
 
+function dibujaMonopolio(ctx, ch, A, k) {
+  const X = ch.scales.x, Y = ch.scales.y, px = q => X.getPixelForValue(q), py = p => Y.getPixelForValue(p), mor = '#c792ea', rojo = '#ff6b72', tinta = css('--tinta');
+  // Pérdida para la sociedad: lo que se deja de producir al restringir la cantidad.
+  ctx.beginPath(); ctx.moveTo(px(k.Qm), py(k.Pm)); ctx.lineTo(px(k.Qe), py(k.Pe)); ctx.lineTo(px(k.Qm), py(k.cmg)); ctx.closePath();
+  ctx.fillStyle = 'rgba(255,107,114,.28)'; ctx.fill();
+  // Curva de ingreso marginal (cae el doble de rápido que la demanda).
+  const qa = X.min, qb = X.max; ctx.setLineDash([9, 5]); ctx.lineWidth = 3; ctx.strokeStyle = mor;
+  ctx.beginPath(); ctx.moveTo(px(qa), py(k.alfa + 2 * k.beta * qa)); ctx.lineTo(px(qb), py(k.alfa + 2 * k.beta * qb)); ctx.stroke(); ctx.setLineDash([]);
+  // Del cruce IMg = CMg hacia arriba, hasta la demanda: ahí la empresa fija su precio.
+  ctx.setLineDash([5, 4]); ctx.lineWidth = 1.8; ctx.strokeStyle = tinta;
+  ctx.beginPath(); ctx.moveTo(px(k.Qm), A.bottom); ctx.lineTo(px(k.Qm), py(k.Pm)); ctx.lineTo(A.left, py(k.Pm)); ctx.stroke(); ctx.setLineDash([]);
+  const punto = (q, p, rel, c) => { ctx.beginPath(); ctx.arc(px(q), py(p), 7, 0, 7); ctx.fillStyle = rel; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = c; ctx.stroke(); };
+  punto(k.Qm, k.cmg, css('--tarj'), mor);                       // ① donde IMg = CMg
+  punto(k.Qm, k.Pm, rojo, tinta);                               // ② precio del monopolio
+  texto(ctx, '① IMg = CMg: produce solo ' + fQ(k.Qm), px(k.Qm) + 12, py(k.cmg) + 16, mor, 'left', '800 12px system-ui');
+  texto(ctx, '② Monopolio sin restricciones: ' + fP(k.Pm) + ' · ' + fQ(k.Qm), px(k.Qm) + 12, py(k.Pm) - 10, rojo, 'left', '800 13px system-ui');
+  texto(ctx, 'Con regulación: ' + fP(k.Pe) + ' · ' + fQ(k.Qe), px(k.Qe) + 10, py(k.Pe) + 20, tinta, 'left', '700 12px system-ui');
+  texto(ctx, 'Ingreso marginal (IMg)', A.left + 10, A.top + 34, mor, 'left', '800 13px system-ui');
+  texto(ctx, 'Pérdida para la sociedad', (px(k.Qm) + px(k.Qe)) / 2, (py(k.Pm) + py(k.cmg)) / 2 + 4, rojo, 'center', '700 11px system-ui');
+}
+
 const pluginMercado = { id: 'anotaM', afterDatasetsDraw(ch) {
   const n = notas.get(ch.canvas); if (!n || n.trabajo) return;
   const { ctx, chartArea: A } = ch, M = i => ch.getDatasetMeta(i).data, rojo = css('--baja'), verde = css('--sube'), tinta = css('--tinta'), gris = css('--antes');
@@ -79,6 +100,7 @@ const pluginMercado = { id: 'anotaM', afterDatasetsDraw(ch) {
     texto(ctx, 'Cambios no registrados', cx, cy, css('--suave'), 'center', '800 17px system-ui');
     texto(ctx, 'Aquí el efecto es tan pequeño que las curvas casi no se mueven.', cx, cy + 22, css('--suave'), 'center', '600 12px system-ui');
   }
+  if (n.mono) dibujaMonopolio(ctx, ch, A, n.mono);
   const sufijo = n.fase === 'antes' ? '' : ' ahora';
   texto(ctx, 'Demanda' + sufijo, A.left + 8, A.top - 6, css('--dem'), 'left', '700 13px system-ui');
   texto(ctx, 'Oferta' + sufijo, A.right - 8, A.top - 6, css('--ofe'), 'right', '700 13px system-ui');
@@ -116,14 +138,35 @@ const pluginMercado = { id: 'anotaM', afterDatasetsDraw(ch) {
 //   'mueve' → las mismas curvas se trasladan solas; se destapa el rastro punteado y no hay puntos
 //   'fin'   → quedan el rastro, el punto de antes y el de ahora
 // a = estado antes, m = estado después, o.shift = {curva, dir, txt}.
+// ---- Monopolio sin restricciones (solo el mercado de energía) ----
+// Demanda lineal  P = α + β·Q  (β < 0).  Ingreso marginal  IMg = α + 2β·Q  (cae el doble de rápido).
+// Costo marginal  CMg = curva de oferta.  El monopolio produce donde IMg = CMg y cobra lo que dice la demanda en esa cantidad.
+let modoMono = false;
+export const setMonopolio = v => { modoMono = !!v; };
+export function monopolioDe(m) {
+  const d = m.curvas.demanda, s = m.curvas.oferta, k = Math.floor(d.length / 3), j = Math.floor(2 * d.length / 3);
+  const sd = (d[j].x - d[k].x) / (d[j].y - d[k].y), ss = (s[j].x - s[k].x) / (s[j].y - s[k].y);   // cantidad por cada $ de precio
+  if (!(sd < 0) || !(ss > 0)) return null;
+  const Pe = m.precio, Qe = m.cantidad, beta = 1 / sd, alfa = Pe - beta * Qe, inv = 1 / ss;
+  let Qm = Qe * (Math.abs(beta) + inv) / (2 * Math.abs(beta) + inv), cmg = Pe + (Qm - Qe) * inv;
+  // Un costo no puede ser negativo: si la recta de oferta se pasa de cero, el costo de la última unidad se toma como 0.
+  if (cmg < 0) { Qm = -alfa / (2 * beta); cmg = 0; }
+  const Pm = alfa + beta * Qm;
+  return { Pe, Qe, Pm, Qm, cmg, alfa, beta, inv };
+}
+
 export function graficoMercado(canvas, a, m, o = {}) {
+  const mono = (modoMono && m.id === 'energia') ? monopolioDe(m) : null;
+  if (mono) { a = m; o = { ...o, shift: null, rastro: false, fase: 'antes', solo: null }; }
   // Si el cambio es casi invisible (menos de 0,3 % en precio y cantidad), no se dibuja ningún traslado:
   // se muestra el mercado tal como quedó, sin rastro, flechas ni punto de «antes» encimado.
-  const peq = Math.abs(m.cantidad / a.cantidad - 1) < .003 && Math.abs(m.precio / a.precio - 1) < .003;
+  const peq = !mono && Math.abs(m.cantidad / a.cantidad - 1) < .003 && Math.abs(m.precio / a.precio - 1) < .003;
   if (peq) { a = m; o = { ...o, shift: null, rastro: false, fase: 'antes', solo: null }; }
   const fase = o.fase || 'fin', gris = css('--antes'), viaja = fase !== 'antes';
-  const rx = nice((a.cantidad + m.cantidad) / 2, zoom(a.cantidad, m.cantidad - a.cantidad), true);
-  const ry = nice((a.precio + m.precio) / 2, zoom(a.precio, m.precio - a.precio), true);
+  // En la vista de monopolio los ejes se abren para que quepan el punto de equilibrio y el del monopolio.
+  const caja = (lo, hi) => nice((lo + hi) / 2, (hi - lo) / 2 * 1.08, true);
+  const rx = mono ? caja(mono.Qm * .85, mono.Qe * 1.15) : nice((a.cantidad + m.cantidad) / 2, zoom(a.cantidad, m.cantidad - a.cantidad), true);
+  const ry = mono ? caja(Math.min(mono.cmg, mono.Pe) * .85, mono.Pm * 1.1) : nice((a.precio + m.precio) / 2, zoom(a.precio, m.precio - a.precio), true);
   const recta = pts => { const n = pts.length, p = pts[Math.floor(n / 3)], q = pts[Math.floor(2 * n / 3)], xa = y => p.x + (y - p.y) * (q.x - p.x) / (q.y - p.y);
     return [{ x: xa(ry.min), y: ry.min }, { x: xa(ry.max), y: ry.max }]; };
   const vivo = viaja ? m : a;
@@ -133,7 +176,7 @@ export function graficoMercado(canvas, a, m, o = {}) {
   // Solo deja rastro la curva que de verdad se movió; la que se queda quieta no lleva línea punteada.
   const pt = (c, k) => c[Math.floor(c.length * k)].x, movida = c => Math.abs(pt(a.curvas[c], .5) - pt(m.curvas[c], .5)) > 1e-4 * a.cantidad;
   const rastro = c => ({ borderDash: [7, 5], borderWidth: 2, borderColor: visible && movida(c) ? gris : invisible });
-  notas.set(canvas, { a, b: m, fase, shift: o.shift, trabajo: false, peq: peq && !!o.evento });
+  notas.set(canvas, { a, b: m, fase, shift: o.shift, trabajo: false, peq: peq && !!o.evento, mono });
   dibujar(canvas, { type: 'scatter', data: { datasets: [
     linea(recta(a.curvas.demanda), gris, rastro('demanda')), linea(recta(a.curvas.oferta), gris, rastro('oferta')),
     linea(recta(cDem.curvas.demanda), css('--dem')), linea(recta(cOfe.curvas.oferta), css('--ofe')),

@@ -1,4 +1,4 @@
-// Agente 6 · Identidad del país, glosario y textos «En resumen».
+// Identidad del país, glosario y textos «En resumen».
 export const NOMBRES = ['Valdoria','Montebel','Sarandia','Tavira','Corinto','Lumbria','Ostrava','Pelagia','Quintaria','Merovia'];
 
 export const GLOSARIO = {
@@ -86,7 +86,7 @@ export const MERCADO_TIPO = {
     rasgos: ['Un único vendedor', 'Sin sustitutos cercanos: no hay otra red a la cual conectarse', 'Barreras de entrada enormes: construir otra red cuesta demasiado (monopolio natural)', 'La empresa fija el precio; el Estado suele regularlo'],
     productores: 'La empresa no acepta el precio: lo elige. Produce menos de lo que produciría un mercado competitivo y cobra más, porque sabe que los hogares no pueden irse a otro proveedor. Por eso suele estar regulada.',
     consumidores: 'Pagan el precio que fije la empresa o reducen su consumo; no tienen a quién más comprarle. Como la energía es casi indispensable, su demanda reacciona poco al precio.',
-    grafica: 'La curva naranja representa los costos de la única empresa (su costo marginal), no a muchos vendedores. El cruce muestra el precio regulado al que se le obliga a vender; un monopolio sin regulación cobraría más y vendería menos.' },
+    grafica: 'La curva naranja es el costo de producir una unidad más para la única empresa (costo marginal), no la suma de muchos vendedores. El cruce con la demanda es lo que pasaría si el Estado la obligara a cobrar lo que le cuesta producir. Pulsa «Ver monopolio sin restricciones» sobre la gráfica para ver qué haría la empresa si nadie la regulara.' },
   vivienda: { tipo: CP, quien: 'Muchos propietarios, constructoras e inmobiliarias.',
     rasgos: ['Muchos oferentes y muchos inquilinos', 'Cada vivienda es parecida a otras de su zona', 'Nadie controla una parte grande del mercado', 'Los precios de arriendo son públicos'] },
   ropa: { tipo: CP, quien: 'Cientos de talleres, fábricas y tiendas.',
@@ -100,9 +100,25 @@ export const MERCADO_TIPO = {
   turismo: { tipo: CP, quien: 'Miles de hoteles, restaurantes y agencias.',
     rasgos: ['Muchísimos negocios pequeños', 'Ofertas parecidas y fáciles de comparar', 'Abrir un negocio es fácil', 'Nadie fija el precio por su cuenta'] }
 };
+export const $$ = v => '$ ' + v.toLocaleString('es', { maximumFractionDigits: v < 100 ? 1 : 0 }), mm = v => new Intl.NumberFormat('es', { notation: 'compact', maximumFractionDigits: 1 }).format(v);
+function explicaMonopolio(k) {
+  const num = k ? ` En tu país ahora: la empresa produciría ${mm(k.Qm)} unidades en lugar de ${mm(k.Qe)} y cobraría ${$$(k.Pm)} en lugar de ${$$(k.Pe)}.` : '';
+  return `<section class="indicador" style="--ac:#c792ea">
+    <div class="bloque" style="--ac:#c792ea"><h4 class="tit"><span class="ic">📈</span>El monopolio sin restricciones, paso a paso</h4>
+      <ol class="pasos">
+        <li><b>Demanda.</b> Dice cuánta energía compra la gente a cada precio. Para vender más, la empresa tiene que bajar el precio, y lo baja para todas las unidades, no solo para la última.</li>
+        <li><b>Ingreso marginal (línea morada).</b> Es lo que la empresa gana al vender una unidad más. Siempre es menor que el precio, porque esa unidad extra obliga a abaratar todas las demás. Por eso cae el doble de rápido que la demanda.</li>
+        <li><b>Costo marginal (curva naranja).</b> Es lo que le cuesta producir una unidad más.</li>
+        <li><b>① Cuánto produce.</b> Mientras una unidad extra aporte más ingreso que costo, conviene producirla. La empresa se detiene donde el ingreso marginal es igual al costo marginal. Ahí está el punto ①, siempre a la izquierda del equilibrio competitivo.</li>
+        <li><b>② Qué precio cobra.</b> Desde esa cantidad sube hasta la demanda y cobra lo máximo que la gente está dispuesta a pagar por ella. Es el punto ②, mucho más alto que el costo.</li>
+        <li><b>Qué se pierde.</b> Con regulación se producirían más unidades a un precio menor. El triángulo rojo es el valor de las unidades que la gente querría y que costaría producir menos de lo que pagaría, pero que el monopolio no produce.</li>
+      </ol>
+      <p class="texto suave">Como la energía casi no tiene sustitutos, su demanda reacciona poco al precio, y por eso el monopolio puede subirlo bastante sin perder muchos clientes.${num}</p></div>
+  </section>`;
+}
 export const nombreTipo = t => t === MO ? 'Monopolio' : 'Competencia perfecta';
 export function tipoDe(id) { return MERCADO_TIPO[id] || { tipo: CP, quien: 'Muchos productores y compradores.', rasgos: [] }; }
-export function explicaMercado(id, nombre) {
+export function explicaMercado(id, nombre, k = null) {
   const m = tipoDe(id), d = { ...COMUN_CP, ...m }, mono = m.tipo === MO;
   return `<section class="indicador" style="--ac:${mono ? '#ff6b72' : '#5fd486'}">
     <div class="bloque" style="--ac:${mono ? '#ff6b72' : '#5fd486'}"><h4 class="tit"><span class="ic">${mono ? '🏛️' : '🏪'}</span>${nombre}: ${nombreTipo(m.tipo)}</h4>
@@ -111,5 +127,5 @@ export function explicaMercado(id, nombre) {
     <div class="bloque"><h4>Cómo se comportan los productores</h4><p class="texto">${d.productores}</p></div>
     <div class="bloque"><h4>Cómo se comportan los consumidores</h4><p class="texto">${d.consumidores}</p></div>
     <div class="bloque"><h4>Cómo leer la gráfica</h4><p class="texto">${d.grafica}</p></div>
-  </section>`;
+  </section>${mono ? explicaMonopolio(k) : ''}`;
 }

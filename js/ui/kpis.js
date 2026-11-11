@@ -1,4 +1,4 @@
-// Agente 7 · Indicadores del país: tarjetas compactas y panel lateral con el detalle.
+// Indicadores del país: tarjetas compactas y panel lateral con el detalle.
 import { GLOSARIO } from './narrativa.js';
 const sinMov = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const coma = (v, n = 1) => Number.isFinite(v) ? v.toLocaleString('es', { minimumFractionDigits: n, maximumFractionDigits: n }) : '—';
@@ -176,7 +176,7 @@ export function detalleKpi(clave, estado, previo, hist = []) {
   const hay = !!previo, serie = g => (hist.length ? hist : [estado]).map(e => { try { return g(e); } catch { return NaN; } });
   const comparaciones = estado.comparacion || {};
   const compara = lista => lista.map(x => bloqueCompara(comparaciones[x], TITULOS[x] || 'Comparado con el mundo real', ACC[x])).join('');
-  const sinDatos = '<div class="bloque comp"><h4>Comparado con el mundo real</h4><p class="texto">Para este indicador no hay datos de países reales en <code>datos/paises.json</code>.</p></div>';
+  const sinDatos = '<div class="bloque comp"><h4>Comparado con el mundo real</h4><p class="texto">Para este indicador no hay datos de países reales disponibles.</p></div>';
   const veredicto = (v, p, sb) => { const dif = v - p, nulo = !hay || Math.abs(dif) < 1e-9 * Math.max(1, Math.abs(p));
     return !hay ? 'Todavía no ha habido ningún evento.' : nulo ? 'Con este evento se quedó igual.'
       : sb === null ? `${dif > 0 ? 'Subió' : 'Bajó'}, y eso no es bueno ni malo por sí solo.`

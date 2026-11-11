@@ -220,3 +220,7 @@ html.presentar .paneles{grid-template-columns:1fr 390px}
 .tipo-m.competencia{background:color-mix(in srgb,#5fd486 18%,transparent);border-color:#5fd486;color:#8be3a8}
 .tipo-m.monopolio{background:color-mix(in srgb,#ff6b72 18%,transparent);border-color:#ff6b72;color:#ff9aa0}
 .rasgos{margin:4px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:1rem}
+
+.mono-btn{margin-left:10px;padding:4px 12px;border-radius:999px;font-size:.8rem;font-weight:800;vertical-align:middle;border-color:#c792ea;color:#d9b8f5;background:color-mix(in srgb,#c792ea 16%,transparent)}
+.mono-btn.on{background:#c792ea;color:var(--fondo)}
+.pasos{margin:4px 0 8px;padding-left:22px;display:flex;flex-direction:column;gap:10px;font-size:1.02rem;line-height:1.5}
