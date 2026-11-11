@@ -2,7 +2,7 @@
   "moneda": "USD",
   "poblacionBase": 10000000,
   "pibBase": 200000000000,
-  "nota": "Los mercados están calibrados para un país de 10 millones de habitantes y un PIB de 200 mil millones de USD. Las cantidades crecen proporcionalmente con la población; los precios permanecen constantes.",
+  "nota": "Mercados calibrados para un país de 10 millones de habitantes y un PIB de 200 mil millones de USD. Las cantidades crecen con la población; los precios no. Los ids deben coincidir con los que usa eventos.json.",
   "mercados": [
     {
       "id": "alimentos",
@@ -38,7 +38,7 @@
       "porcentajeImportado": 2
     },
     {
-      "id": "ropa_hogar",
+      "id": "ropa",
       "nombre": "Ropa y hogar",
       "unidad": "canastas anuales de ropa y hogar",
       "precioInicial": 200,
@@ -60,7 +60,7 @@
       "porcentajeImportado": 60
     },
     {
-      "id": "salud_educacion",
+      "id": "salud",
       "nombre": "Salud y educación",
       "unidad": "paquetes anuales de servicios",
       "precioInicial": 4800,
@@ -69,6 +69,28 @@
       "sensibilidadDemanda": -0.25,
       "sensibilidadOferta": 0.5,
       "porcentajeImportado": 5
+    },
+    {
+      "id": "auto",
+      "nombre": "Automotriz y transporte",
+      "unidad": "vehículos y viajes anuales",
+      "precioInicial": 15000,
+      "cantidadInicial": 1600000,
+      "pesoPIB": 12,
+      "sensibilidadDemanda": -1.2,
+      "sensibilidadOferta": 1.0,
+      "porcentajeImportado": 55
+    },
+    {
+      "id": "turismo",
+      "nombre": "Turismo y ocio",
+      "unidad": "viajes y salidas anuales",
+      "precioInicial": 500,
+      "cantidadInicial": 40000000,
+      "pesoPIB": 10,
+      "sensibilidadDemanda": -1.3,
+      "sensibilidadOferta": 1.2,
+      "porcentajeImportado": 10
     }
   ]
 }

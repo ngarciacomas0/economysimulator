@@ -1,4 +1,4 @@
-// Agente 7 · Gráficas con zoom y números reales (Chart.js 4, cargado desde index.html).
+// Gráficas de mercado y de trabajo con Chart.js 4 (cargado desde index.html).
 // Las curvas del «antes» viven siempre en la gráfica: empiezan debajo de las nuevas y se destapan
 // cuando llega el evento, así se ve que la curva se corrió y dejó su rastro en el sitio.
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
@@ -133,11 +133,6 @@ const pluginMercado = { id: 'anotaM', afterDatasetsDraw(ch) {
   ctx.restore();
 } };
 
-// Dibuja un mercado en una de tres fases, siempre con los mismos ejes para que el movimiento se note:
-//   'antes' → curvas y punto de equilibrio de antes del evento
-//   'mueve' → las mismas curvas se trasladan solas; se destapa el rastro punteado y no hay puntos
-//   'fin'   → quedan el rastro, el punto de antes y el de ahora
-// a = estado antes, m = estado después, o.shift = {curva, dir, txt}.
 // ---- Monopolio sin restricciones (solo el mercado de energía) ----
 // Demanda lineal  P = α + β·Q  (β < 0).  Ingreso marginal  IMg = α + 2β·Q  (cae el doble de rápido).
 // Costo marginal  CMg = curva de oferta.  El monopolio produce donde IMg = CMg y cobra lo que dice la demanda en esa cantidad.
@@ -155,6 +150,11 @@ export function monopolioDe(m) {
   return { Pe, Qe, Pm, Qm, cmg, alfa, beta, inv };
 }
 
+// Dibuja un mercado en una de tres fases, siempre con los mismos ejes para que el movimiento se note:
+//   'antes' → curvas y punto de equilibrio de antes del evento
+//   'mueve' → las mismas curvas se trasladan solas; se destapa el rastro punteado y no hay puntos
+//   'fin'   → quedan el rastro, el punto de antes y el de ahora
+// a = estado antes, m = estado después, o.shift = { curva, dir, txt }, o.solo = mover una sola curva.
 export function graficoMercado(canvas, a, m, o = {}) {
   const mono = (modoMono && m.id === 'energia') ? monopolioDe(m) : null;
   if (mono) { a = m; o = { ...o, shift: null, rastro: false, fase: 'antes', solo: null }; }
@@ -247,8 +247,6 @@ const pluginTrabajo = { id: 'anotaT', afterDatasetsDraw(ch) {
   ctx.restore();
 } };
 
-// El mercado laboral se dibuja igual que los demás: tres fases y los mismos ejes.
-// a = trabajo antes, t = trabajo ahora. o.fase: 'antes' | 'mueve' | 'fin'. o.shift = frase del cambio.
 // Pasa una curva a una cuadrícula fija de salarios. Así el «antes» y el «después» tienen los mismos puntos
 // y, al animar, cada punto solo se corre de lado en vez de reacomodarse (que hacía que la curva se encogiera y volviera a crecer).
 const REJILLA = Array.from({ length: 41 }, (_, i) => 0.5 + i * 0.025);
@@ -260,11 +258,13 @@ function muestrea(pts) {
     return { x: u.x + (v.x - u.x) * k, y };
   });
 }
+// El mercado laboral se dibuja igual que los demás: tres fases y los mismos ejes.
+// a = trabajo antes, t = trabajo ahora. o.fase: 'antes' | 'mueve' | 'fin'. o.shift = frase del cambio.
 export function graficoTrabajo(canvas, a, t, o = {}) {
   const fase = o.fase || 'fin', viaja = fase !== 'antes';
   // Las curvas y el salario se dibujan en términos reales (dólares de partida): el mínimo sube con los precios,
   // así que su poder de compra no cambia y las curvas solo se trasladan de lado, sin saltos raros.
-  const P = x => x.indicePrecios ?? 1, w = x => x.salario ?? x.w, esc = (x, pts) => pts;
+  const P = x => x.indicePrecios ?? 1, w = x => x.salario ?? x.w;
   const ca = { demanda: muestrea(a.curvas.demanda), oferta: muestrea(a.curvas.oferta) }, ct = { demanda: muestrea(t.curvas.demanda), oferta: muestrea(t.curvas.oferta) };
   const vivo = viaja ? t : a, cv = viaja ? ct : ca, dif = t.desempleo - a.desempleo, hay = Math.abs(dif) > .0001;
   // Verde si el desempleo baja, rojo si sube; azul mientras no hay evento.
@@ -279,9 +279,8 @@ export function graficoTrabajo(canvas, a, t, o = {}) {
     const f0 = O[i - 1].x - D[i - 1].x, f1 = O[i].x - D[i].x;
     if (f0 === 0 || f0 * f1 < 0) { const t = f0 === f1 ? 0 : f0 / (f0 - f1);
       return { x: D[i - 1].x + (D[i].x - D[i - 1].x) * t, y: D[i - 1].y + (D[i].y - D[i - 1].y) * t }; } } return null; };
-  const cruceR = cruceDe(cv.demanda, cv.oferta), cruce = cruceR;
-  notas.set(canvas, { trabajo: true, cruce, pBase: P(vivo), fase, des: vivo.desempleo, ant: a.desempleo, hayAntes: hay, dif, color: col,
-    ocupadosAntes: a.ocupados, fuerzaAntes: a.fuerzaLaboral, ocupados: vivo.ocupados, fuerza: vivo.fuerzaLaboral, salarioAntes: w(a), salarioAhora: w(vivo), shift: o.shift });
+  notas.set(canvas, { trabajo: true, cruce: cruceDe(cv.demanda, cv.oferta), pBase: P(vivo), fase, des: vivo.desempleo, ant: a.desempleo, hayAntes: hay, dif, color: col,
+    ocupadosAntes: a.ocupados, fuerzaAntes: a.fuerzaLaboral, ocupados: vivo.ocupados, fuerza: vivo.fuerzaLaboral, salarioAntes: w(a), shift: o.shift });
   const rastro = c => ({ borderDash: [6, 5], borderWidth: 1.8, borderColor: movida(c) ? css('--antes') : 'rgba(0,0,0,0)' });
   dibujar(canvas, { type: 'scatter', data: { datasets: [
     linea(ca.demanda, css('--antes'), rastro('demanda')), linea(ca.oferta, css('--antes'), rastro('oferta')),
