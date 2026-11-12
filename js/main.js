@@ -111,7 +111,7 @@ async function verMercado(id, { animar = false, pausa = 1250 } = {}) {
   if (esMono) {
     const bm = document.createElement('button');
     bm.type = 'button'; bm.className = 'mono-btn' + (monoOn ? ' on' : '');
-    bm.textContent = monoOn ? '↩ Volver al evento' : '📈 Ver monopolio sin restricciones';
+    bm.textContent = monoOn ? '↩ Volver' : '📈 Ver monopolio sin restricciones';
     // La gráfica se rehace al entrar y salir de esta vista: así no arrastra el zoom ni los ejes de la anterior.
     bm.onclick = () => { if (!ocupado) { monoOn = !monoOn; reiniciaGrafica($('#c-mercado')); verMercado(m.id); } };
     $('#t-mercado').appendChild(bm);
@@ -128,7 +128,7 @@ async function verMercado(id, { animar = false, pausa = 1250 } = {}) {
   const g = esTrabajo ? null : golpeadoPor(m.id);
   const shift = !hayCambio ? null : esTrabajo
     ? (dQ >= 0 ? 'Las empresas contratan más gente' : 'Las empresas contratan menos gente')
-    : (g ? calcShift(g) : { curva: 'demanda', dir: Math.sign(dQ), txt: dQ >= 0 ? 'Más sueldos → más compras aquí' : 'Menos sueldos → menos compras aquí' });
+    : (g ? calcShift(g) : { curva: 'demanda', dir: Math.sign(dQ), txt: dQ >= 0 ? 'Mayores sueldos, mayor capacidad de compra' : 'Menores sueldos, menor capacidad de compra' });
 
   if (monoOn && esMono) {                                      // vista de monopolio: sin animación
     pinta(a, t, { fase: 'antes' });
@@ -142,7 +142,7 @@ async function verMercado(id, { animar = false, pausa = 1250 } = {}) {
     if (animar) { reiniciaGrafica(canvas); await telon(m); if (mio !== seq) return; }
     pinta(a, t, { fase: 'fin', rastro: false }); return;
   }
-  // La gráfica queda lista en el «antes» detrás del telón; al levantarse, se ve el traslado.
+  // La gráfica queda lista en el "antes" detrás del telón; al levantarse, se ve el traslado.
   if (animar) reiniciaGrafica(canvas);
   pinta(a, t, { fase: 'antes', shift });
   if (animar) { await telon(m); if (mio !== seq) return; }
@@ -157,7 +157,7 @@ async function verMercado(id, { animar = false, pausa = 1250 } = {}) {
     ? fich(shift, 'dem')
       + fich(`Sin empleo ${coma(a.desempleo)} % → ${coma(t.desempleo)} %  ${fl(dP)} ${coma(Math.abs(dP))} puntos`, dP <= 0 ? 'sube' : 'baja')
       + fich(`Con empleo ${fl(dQ)} ${coma(Math.abs(dQ))} %`, dQ >= 0 ? 'sube' : 'baja')
-    : fich(g ? shift.txt : 'Efecto indirecto: nadie golpeó este mercado', 'dem')
+    : fich(g ? shift.txt : 'Efecto indirecto en el mercado', 'dem')
       + fich(`Precio ${a.precio.toFixed(2)} → ${t.precio.toFixed(2)}  ${fl(dP)} ${coma(Math.abs(dP))} %`, dP >= 0 ? 'sube' : 'baja')
       + fich(`Cantidad ${fl(dQ)} ${coma(Math.abs(dQ))} %`, dQ >= 0 ? 'sube' : 'baja');
 }
@@ -202,8 +202,8 @@ function pintaRes() {
     return i > 0 && i < 40 ? `<li><b>${esc(t.slice(0, i))}</b><span>${esc(t.slice(i + 1).trim())}</span></li>` : `<li><span>${esc(t)}</span></li>`;
   }).join('');
   $('#resumen').innerHTML = !pasos && !textoResumen
-    ? '<p class="vacio">Todavía no ha pasado ningún evento. Cuando simules uno, aquí verás la secuencia paso a paso.</p>'
-    : (pasos ? `<h3>Qué pasó, paso a paso</h3><ol class="secuencia">${pasos}</ol>` : '') + (textoResumen ? `<h3>En resumen</h3><p>${esc(textoResumen)}</p>` : '');
+    ? '<p class="vacio">Todavía no ha pasado ningún evento</p>'
+    : (pasos ? `<h3>¿Qué pasó?</h3><ol class="secuencia">${pasos}</ol>` : '') + (textoResumen ? `<h3>En resumen</h3><p>${esc(textoResumen)}</p>` : '');
 }
 const narrar = txt => { if (txt) { secuencia.push(txt); pintaRes(); } };
 // Modo guiado: la secuencia se detiene hasta que se pulsa «Siguiente».
@@ -281,7 +281,7 @@ $('#btn-menu').onclick = abrirMenu; $('#menu-x').onclick = cerrarMenu; $('#menu-
 const enPresentacion = () => document.documentElement.classList.contains('presentar');
 function presentar(on = !enPresentacion()) {
   document.documentElement.classList.toggle('presentar', on);
-  $('#btn-pres').textContent = on ? '🖥 Salir del modo presentación' : '🖥 Modo presentación';
+  $('#btn-pres').textContent = on ? 'Salir del modo presentación' : 'Modo presentación';
   if (on && !document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
   if (!on && document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
   setTimeout(() => window.dispatchEvent(new Event('resize')), 250);

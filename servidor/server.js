@@ -38,7 +38,7 @@ const MAX_TOKENS_RESPUESTA = 600; // respuesta corta: un evento cabe de sobra
 
 const CATEGORIAS = ['gustos', 'clima', 'tecnologia', 'politica', 'comercio', 'crisis'];
 
-// Tipos de golpe permitidos y sus límites (sección 5 del manual).
+// Tipos de golpe permitidos y sus límites 
 const TIPOS = {
   demanda: { min: -40, max: 40 },
   oferta: { min: -40, max: 40 },

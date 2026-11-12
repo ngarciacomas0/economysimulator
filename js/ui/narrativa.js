@@ -60,9 +60,9 @@ export function textoPaso(n, ev, d) {
   const sube = x => x >= 0 ? 'sube' : 'baja';
   return [
     '',
-    `Mercado de ${d.nombre}: la curva ${curva} se mueve (la línea gris punteada es cómo estaba antes). El precio ${sube(d.dP)} ${f(d.dP)} % y la cantidad ${sube(d.dQ)} ${f(d.dQ)} %.`,
-    `Empleo: como se vende ${d.dQ >= 0 ? 'más' : 'menos'}, las empresas contratan ${d.dU <= 0 ? 'más' : 'menos'} y el desempleo ${d.dU <= 0 ? 'baja' : 'sube'} ${f(d.dU, 2)} puntos. El salario mínimo sube lo mismo que los precios (parte de $ 1.000 al mes), así que su poder de compra no cambia y la gráfica lo muestra en dólares de partida; por eso el desempleo es la distancia entre la gente que quiere trabajar a ese salario y los puestos que ofrecen las empresas. Puedes verlo en el botón «Mercado laboral».`,
-    `Efecto en cadena: quien ${d.dU <= 0 ? 'gana' : 'pierde'} sueldo compra ${d.dU <= 0 ? 'más' : 'menos'} en los demás mercados. Junto a cada mercado verás cuánto cambió su precio, y puedes tocarlo para ver su gráfica.`,
+    `Mercado de ${d.nombre}: la curva ${curva} se mueve (la línea gris punteada era su estado anterior). El precio ${sube(d.dP)} ${f(d.dP)} % y la cantidad ${sube(d.dQ)} ${f(d.dQ)} %.`,
+    `Empleo: como se vende ${d.dQ >= 0 ? 'más' : 'menos'}, las empresas contratan ${d.dU <= 0 ? 'más' : 'menos'} y el desempleo ${d.dU <= 0 ? 'baja' : 'sube'} ${f(d.dU, 2)} puntos porcentuales. El salario mínimo sube lo mismo que los precios (desde $1000 iniciales), así que su poder de compra no cambia y la gráfica lo muestra en dólares de partida, por eso el desempleo es la distancia entre la gente que quiere trabajar a ese salario y los puestos que ofrecen las empresas. Puedes verlo en el botón "Mercado laboral".`,
+    `Efecto en cadena: quien ${d.dU <= 0 ? 'gana' : 'pierde'} sueldo compra ${d.dU <= 0 ? 'más' : 'menos'}. Junto a cada mercado verás cuánto cambió su precio, y puedes tocarlo para ver su gráfica.`,
     'Indicadores macroeconómicos: a la derecha ya están actualizados el PIB, los precios y el empleo, comparados con antes. Toca uno para ver el detalle.'
   ][n];
 }
@@ -70,17 +70,17 @@ export function textoPaso(n, ev, d) {
 // ---------- tipo de mercado de cada sector (competencia perfecta o monopolio) ----------
 const CP = 'competencia', MO = 'monopolio';
 const COMUN_CP = {
-  productores: 'Son precio-aceptantes: ninguno puede subir el precio por su cuenta, porque los compradores se irían con otro. Cada uno decide solo cuánto producir, y producen hasta que el precio cubre el costo de la última unidad.',
-  consumidores: 'Comparan precios con libertad y cambian de vendedor sin costo. El precio sale del cruce entre lo que todos quieren comprar y lo que todos quieren vender.',
+  consumidores: 'Comparan precios con libertad y cambian de vendedor sin costo. El precio sale del cruce entre lo que todos quieren comprar y lo que todos quieren vender, llamado precio de equilibrio.',
+  productores: 'Aceptan el precio fijado: ninguno puede subir el precio por su cuenta, porque los compradores se irían con otro. Cada uno decide solo cuánto producir, y producen hasta que el precio cubre el costo de la última unidad.',
   grafica: 'Las dos curvas son la demanda (azul) y la oferta del mercado (naranja). El equilibrio es su cruce.'
 };
 const MERCADO_TIPO = {
-  alimentos: { tipo: CP, quien: 'Miles de agricultores, ganaderos y tiendas.',
-    rasgos: ['Muchísimos productores pequeños', 'Producto homogéneo: un kilo de arroz es igual a otro', 'Entrar y salir del negocio es fácil', 'Todos conocen el precio del mercado'] },
+  alimentos: { tipo: CP, quien: 'Agricultores, ganaderos y tiendas.',
+    rasgos: ['Productores pequeños', 'Producto homogéneo: un kilo de arroz es igual a otro', 'Entrar y salir del negocio es menos complicado', 'Mayormente se conoce el precio del mercado'] },
   energia: { tipo: MO, quien: 'Una sola empresa dueña de las plantas y de la red eléctrica.',
-    rasgos: ['Un único vendedor', 'Sin sustitutos cercanos: no hay otra red a la cual conectarse', 'Barreras de entrada enormes: construir otra red cuesta demasiado (monopolio natural)', 'La empresa fija el precio; el Estado suele regularlo'],
-    productores: 'La empresa no acepta el precio: lo elige. Produce menos de lo que produciría un mercado competitivo y cobra más, porque sabe que los hogares no pueden irse a otro proveedor. Por eso suele estar regulada.',
-    consumidores: 'Pagan el precio que fije la empresa o reducen su consumo; no tienen a quién más comprarle. Como la energía es casi indispensable, su demanda reacciona poco al precio.',
+    rasgos: ['Un único vendedor', 'Sin sustitutos cercanos ya que no hay otra red a la cual conectarse', 'Barreras de entrada enormes debido al costo de construir otra red.', 'La empresa fija el precio y el Estado suele regularlo'],
+    productores: 'La empresa elige el precio de su producto. Produce menos de lo que produciría un mercado competitivo y cobra más, porque sabe que los hogares no pueden irse a otro proveedor. Por eso suele estar regulada',
+    consumidores: 'Pagan el precio que fije la empresa o reducen su consumo debido no tienen a quién más comprarle. Como la energía es casi indispensable, su demanda reacciona poco al precio.',
     grafica: 'La curva naranja es el costo de producir una unidad más para la única empresa (costo marginal), no la suma de muchos vendedores. El cruce con la demanda es lo que pasaría si el Estado la obligara a cobrar lo que le cuesta producir. Pulsa «Ver monopolio sin restricciones» sobre la gráfica para ver qué haría la empresa si nadie la regulara.' },
   vivienda: { tipo: CP, quien: 'Muchos propietarios, constructoras e inmobiliarias.',
     rasgos: ['Muchos oferentes y muchos inquilinos', 'Cada vivienda es parecida a otras de su zona', 'Nadie controla una parte grande del mercado', 'Los precios de arriendo son públicos'] },
@@ -108,8 +108,8 @@ function explicaMonopolio(k) {
         <li><b>Demanda.</b> Dice cuánta energía compra la gente a cada precio. Para vender más, la empresa tiene que bajar el precio, y lo baja para todas las unidades, no solo para la última.</li>
         <li><b>Ingreso marginal (línea morada).</b> Es lo que la empresa gana al vender una unidad más. Siempre es menor que el precio, porque esa unidad extra obliga a abaratar todas las demás. Por eso cae el doble de rápido que la demanda.</li>
         <li><b>Costo marginal (curva naranja).</b> Es lo que le cuesta producir una unidad más.</li>
-        <li><b>① Cuánto produce.</b> Mientras una unidad extra aporte más ingreso que costo, conviene producirla. La empresa se detiene donde el ingreso marginal es igual al costo marginal. Ahí está el punto ①, siempre a la izquierda del equilibrio competitivo.</li>
-        <li><b>② Qué precio cobra.</b> Desde esa cantidad sube hasta la demanda y cobra lo máximo que la gente está dispuesta a pagar por ella. Es el punto ②, mucho más alto que el costo.</li>
+        <li><b>① Cuánto produce.</b> Mientras una unidad extra aporte más ingreso que costo, conviene producirla. La empresa se detiene donde el ingreso marginal es igual al costo marginal. Ahí está el punto 1, siempre a la izquierda del equilibrio competitivo.</li>
+        <li><b>② Qué precio cobra.</b> Desde la cantidad antes fijada se sube hasta la curva de demanda y cobra lo máximo que la gente está dispuesta a pagar por ella. Es el punto ②, mucho más alto que el costo.</li>
         <li><b>Qué se pierde.</b> Con regulación se producirían más unidades a un precio menor. El triángulo rojo es el valor de las unidades que la gente querría y que costaría producir menos de lo que pagaría, pero que el monopolio no produce.</li>
       </ol>
       <p class="texto suave">Como la energía casi no tiene sustitutos, su demanda reacciona poco al precio, y por eso el monopolio puede subirlo bastante sin perder muchos clientes.${num}</p></div>

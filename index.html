@@ -25,7 +25,6 @@
   <section id="macro" class="col" aria-label="Macro: el país">
     <h3 class="rotulo">Indicadores macroeconómicos</h3>
     <div id="kpis" class="kpis"></div>
-    <p class="pista-kpi">Toca un indicador para ver el detalle.</p>
   </section>
 </main>
 <div id="modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="m-tit">
@@ -48,11 +47,11 @@
           <button id="btn-sim" class="grande">Simular evento</button>
           <button id="btn-ia" hidden>Evento con IA</button>
           <button id="btn-reset">Reiniciar</button>
-          <button id="btn-pres">🖥 Modo presentación</button>
+          <button id="btn-pres">Modo presentación</button>
         </div>
       </div>
       <div class="bloque" style="--ac:#ffa04d">
-        <h4 class="tit"><span class="ic">💬</span>Qué pasó</h4>
+        <h4 class="tit"><span class="ic"></span>¿Qué pasó?</h4>
         <div id="resumen" class="resumen"></div>
       </div>
       <div class="bloque" style="--ac:#6aa8ff">
@@ -61,7 +60,7 @@
           <label>Población <select id="sel-pob"><option value="1">1 millón</option><option value="10" selected>10 millones</option><option value="50">50 millones</option><option value="100">100 millones</option></select></label>
           <label>Perfil del país <select id="sel-perfil"><option value="emergente">Emergente</option><option value="medio" selected>Medio-alto</option><option value="desarrollado">Desarrollado</option></select></label>
           <label>Mercados <select id="sel-n"><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></label>
-          <label class="fila"><input type="checkbox" id="chk-guiado"> Modo guiado (paso a paso)</label>
+          <label class="fila"><input type="checkbox" id="chk-guiado"> Modo paso a paso</label>
         </div>
       </div>
     </div>

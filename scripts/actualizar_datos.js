@@ -1,5 +1,5 @@
 /**
- * MiniPaís · Descarga del Banco Mundial los datos de js/datos/paises.json.
+  MiniPaís · Descarga del Banco Mundial los datos de js/datos/paises.json.
  * Requiere Node 18 o superior; no necesita clave. Se corre con `npm run actualizar-datos`.
  */
 const fs = require('node:fs/promises');
